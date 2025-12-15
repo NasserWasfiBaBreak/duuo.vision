@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../context/FormContext';
+import { generateFieldSuggestions, predictFormValues } from '../utils/formSuggestions';
 import Tooltip from '../components/Tooltip';
 import './FormPage.css';
 
@@ -12,6 +13,8 @@ const DriverInfo = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [touched, setTouched] = useState({}); // Track which fields have been touched
+  const [suggestions, setSuggestions] = useState({}); // AI suggestions for form fields
+  const [predictions, setPredictions] = useState({}); // AI predictions for form values
   const navigate = useNavigate();
 
   // Set smart defaults based on existing data
@@ -21,6 +24,12 @@ const DriverInfo = () => {
       setEntryMethod('manual');
     }
   }, []);
+
+  // Generate AI predictions when form data changes
+  useEffect(() => {
+    const newPredictions = predictFormValues(formData);
+    setPredictions(newPredictions);
+  }, [formData]);
 
   // Automatically initiate scanning when scan option is selected
   useEffect(() => {
@@ -115,6 +124,13 @@ const DriverInfo = () => {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
     
+    // Generate AI suggestions for the field
+    const fieldSuggestions = generateFieldSuggestions(name, newValue, formData);
+    setSuggestions(prev => ({
+      ...prev,
+      [name]: fieldSuggestions
+    }));
+    
     // Handle conditional fields
     if (name === 'hasPreviousClaims' && value === 'no') {
       updateMultipleFields({ numberOfClaims: '', claimDetails: '' });
@@ -128,6 +144,20 @@ const DriverInfo = () => {
     if (name === 'hasTickets' && value === 'no') {
       updateMultipleFields({ ticketDetails: '' });
     }
+  };
+
+  // Apply AI suggestion to a field
+  const applySuggestion = (fieldName, suggestionValue) => {
+    updateMultipleFields({ [fieldName]: suggestionValue });
+    setSuggestions(prev => ({
+      ...prev,
+      [fieldName]: []
+    }));
+  };
+
+  // Apply AI prediction to a field
+  const applyPrediction = (fieldName, predictionValue) => {
+    updateMultipleFields({ [fieldName]: predictionValue });
   };
 
   // Real-time validation
@@ -388,6 +418,33 @@ const DriverInfo = () => {
                     placeholder="e.g., John"
                     className={errors.firstName ? 'error' : ''}
                   />
+                  {/* AI Suggestions */}
+                  {suggestions.firstName && suggestions.firstName.length > 0 && (
+                    <div className="ai-suggestions">
+                      {suggestions.firstName.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          className="suggestion-item"
+                          onClick={() => applySuggestion('firstName', suggestion.value)}
+                        >
+                          {suggestion.label}: {suggestion.value}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {/* AI Predictions */}
+                  {predictions.email && (
+                    <div className="ai-prediction">
+                      <button
+                        type="button"
+                        className="prediction-item"
+                        onClick={() => applyPrediction('email', predictions.email.value)}
+                      >
+                        Predicted email: {predictions.email.value}
+                      </button>
+                    </div>
+                  )}
                   {errors.firstName && <span className="error-message">{errors.firstName}</span>}
                 </div>
                 
@@ -403,6 +460,21 @@ const DriverInfo = () => {
                     placeholder="e.g., Smith"
                     className={errors.lastName ? 'error' : ''}
                   />
+                  {/* AI Suggestions */}
+                  {suggestions.lastName && suggestions.lastName.length > 0 && (
+                    <div className="ai-suggestions">
+                      {suggestions.lastName.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          className="suggestion-item"
+                          onClick={() => applySuggestion('lastName', suggestion.value)}
+                        >
+                          {suggestion.label}: {suggestion.value}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {errors.lastName && <span className="error-message">{errors.lastName}</span>}
                 </div>
               </div>
@@ -419,6 +491,21 @@ const DriverInfo = () => {
                     onBlur={handleBlur}
                     className={errors.dateOfBirth ? 'error' : ''}
                   />
+                  {/* AI Suggestions */}
+                  {suggestions.dateOfBirth && suggestions.dateOfBirth.length > 0 && (
+                    <div className="ai-suggestions">
+                      {suggestions.dateOfBirth.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          className="suggestion-item"
+                          onClick={() => applySuggestion('dateOfBirth', suggestion.value)}
+                        >
+                          {suggestion.label}: {suggestion.value}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {errors.dateOfBirth && <span className="error-message">{errors.dateOfBirth}</span>}
                 </div>
                 
@@ -502,6 +589,21 @@ const DriverInfo = () => {
                     placeholder="e.g., 123 Main Street"
                     className={errors.address ? 'error' : ''}
                   />
+                  {/* AI Suggestions */}
+                  {suggestions.address && suggestions.address.length > 0 && (
+                    <div className="ai-suggestions">
+                      {suggestions.address.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          className="suggestion-item"
+                          onClick={() => applySuggestion('address', suggestion.value)}
+                        >
+                          {suggestion.label}: {suggestion.value}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {errors.address && <span className="error-message">{errors.address}</span>}
                 </div>
               </div>
@@ -547,6 +649,18 @@ const DriverInfo = () => {
                     <option value="SK">Saskatchewan</option>
                     <option value="YT">Yukon</option>
                   </select>
+                  {/* AI Predictions */}
+                  {predictions.province && (
+                    <div className="ai-prediction">
+                      <button
+                        type="button"
+                        className="prediction-item"
+                        onClick={() => applyPrediction('province', predictions.province.value)}
+                      >
+                        Predicted from postal code: {predictions.province.value}
+                      </button>
+                    </div>
+                  )}
                   {errors.province && <span className="error-message">{errors.province}</span>}
                 </div>
               </div>
@@ -564,6 +678,21 @@ const DriverInfo = () => {
                     placeholder="e.g., M5V 3A8"
                     className={errors.postalCode ? 'error' : ''}
                   />
+                  {/* AI Suggestions */}
+                  {suggestions.postalCode && suggestions.postalCode.length > 0 && (
+                    <div className="ai-suggestions">
+                      {suggestions.postalCode.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          className="suggestion-item"
+                          onClick={() => applySuggestion('postalCode', suggestion.value)}
+                        >
+                          {suggestion.label}: {suggestion.value}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {errors.postalCode && <span className="error-message">{errors.postalCode}</span>}
                 </div>
               </div>

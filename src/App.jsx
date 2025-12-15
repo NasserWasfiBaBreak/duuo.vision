@@ -1,7 +1,9 @@
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { FormProvider } from './context/FormContext';
+import { useEffect } from 'react';
 import Header from './components/Header';
 import ProgressBar from './components/ProgressBar';
+import AIAssistant from './components/AIAssistant';
 import Welcome from './pages/Welcome';
 import DriverInfo from './pages/DriverInfo';
 import VehicleInfo from './pages/VehicleInfo';
@@ -11,11 +13,23 @@ import QuoteSummary from './pages/QuoteSummary';
 import Payment from './pages/Payment';
 import './App.css';
 
+// Custom hook to scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <Router>
       <FormProvider>
         <div className="App">
+          <ScrollToTop />
           <a href="#main-content" className="skip-link">Skip to main content</a>
           <Header />
           <ProgressBar />
@@ -30,6 +44,7 @@ function App() {
               <Route path="/payment" element={<Payment />} />
             </Routes>
           </main>
+          <AIAssistant />
         </div>
       </FormProvider>
     </Router>

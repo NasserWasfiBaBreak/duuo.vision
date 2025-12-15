@@ -1,38 +1,25 @@
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../context/FormContext';
+import { calculateDriverRiskScore, calculateVehicleRiskScore, generateInsuranceRecommendations, estimatePremium } from '../utils/riskAssessment';
 import './QuoteSummary.css';
 
 const QuoteSummary = () => {
   const { formData, clearSavedData } = useFormContext();
   const navigate = useNavigate();
 
-  // Calculate estimated premium based on form data
-  const calculatePremium = () => {
-    let baseRate = 1200;
-    
-    // Adjust based on driver age (simplified)
-    const birthYear = new Date(formData.dateOfBirth).getFullYear();
-    const age = new Date().getFullYear() - birthYear;
-    
-    if (age < 25) baseRate *= 1.5;
-    if (age > 65) baseRate *= 1.2;
-    
-    // Adjust based on vehicle year
-    const currentYear = new Date().getFullYear();
-    const vehicleAge = currentYear - parseInt(formData.year || currentYear);
-    
-    if (vehicleAge < 2) baseRate *= 1.3;
-    if (vehicleAge > 10) baseRate *= 0.8;
-    
-    // Adjust based on coverage selections
-    if (formData.collision) baseRate += 300;
-    if (formData.comprehensive) baseRate += 200;
-    if (formData.accidentForgiveness) baseRate += 100;
-    
-    return Math.round(baseRate);
-  };
-
-  const estimatedPremium = calculatePremium();
+  // Calculate risk assessments
+  const driverRisk = calculateDriverRiskScore(formData);
+  const vehicleRisk = calculateVehicleRiskScore(formData);
+  
+  // Generate AI recommendations
+  const recommendations = generateInsuranceRecommendations(driverRisk, vehicleRisk);
+  
+  // Estimate premium using AI model
+  const premiumEstimate = estimatePremium(driverRisk.score, vehicleRisk.score, {
+    collision: formData.collision,
+    comprehensive: formData.comprehensive,
+    accidentForgiveness: formData.accidentForgiveness
+  });
 
   const handlePurchase = () => {
     // Clear saved data after purchase
@@ -123,13 +110,74 @@ const QuoteSummary = () => {
                 <span className="value">{formData.accidentForgiveness ? 'Included' : 'Not included'}</span>
               </div>
             </div>
+            
+            {/* AI Risk Assessment Section */}
+            <div className="summary-section">
+              <h2>AI Risk Assessment</h2>
+              <div className="risk-assessment">
+                <div className="risk-card">
+                  <h3>Driver Risk Profile</h3>
+                  <div className={`risk-score ${driverRisk.riskLevel}`}>
+                    <span className="score-value">{driverRisk.score}/100</span>
+                    <span className="risk-level">{driverRisk.riskDescription}</span>
+                  </div>
+                  <div className="risk-factors">
+                    <h4>Key Factors:</h4>
+                    <ul>
+                      {driverRisk.factors.slice(0, 3).map((factor, index) => (
+                        <li key={index}>
+                          <strong>{factor.factor}:</strong> {factor.description}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="risk-card">
+                  <h3>Vehicle Risk Profile</h3>
+                  <div className={`risk-score ${vehicleRisk.riskLevel}`}>
+                    <span className="score-value">{vehicleRisk.score}/100</span>
+                    <span className="risk-level">{vehicleRisk.riskDescription}</span>
+                  </div>
+                  <div className="risk-factors">
+                    <h4>Key Factors:</h4>
+                    <ul>
+                      {vehicleRisk.factors.slice(0, 3).map((factor, index) => (
+                        <li key={index}>
+                          <strong>{factor.factor}:</strong> {factor.description}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* AI Recommendations Section */}
+            {recommendations.recommendations.length > 0 && (
+              <div className="summary-section">
+                <h2>AI Recommendations</h2>
+                <div className="recommendations">
+                  {recommendations.recommendations.map((rec, index) => (
+                    <div key={index} className={`recommendation-card ${rec.priority}`}>
+                      <h3>{rec.title}</h3>
+                      <p>{rec.description}</p>
+                      <div className="benefit">
+                        <strong>Benefit:</strong> {rec.benefit}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           
           <div className="quote-sidebar">
             <div className="premium-box">
               <h3>Estimated Annual Premium</h3>
-              <div className="premium-amount">${estimatedPremium.toLocaleString()}</div>
-              <div className="premium-disclaimer">* This is an estimate only. Final price may vary.</div>
+              <div className="premium-amount">${premiumEstimate.annual.toLocaleString()}</div>
+              <div className="monthly-rate">or ${premiumEstimate.monthly}/month</div>
+              <div className="premium-disclaimer">* This is an AI-generated estimate. Final price may vary.</div>
               
               <button className="btn-primary" onClick={handlePurchase}>
                 Purchase Now
