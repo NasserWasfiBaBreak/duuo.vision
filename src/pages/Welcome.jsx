@@ -17,7 +17,7 @@ const Welcome = () => {
             <h1 className="hero-title">Auto Insurance</h1>
             <p className="hero-subtitle">Get your quote in minutes</p>
             <p className="hero-description">
-              Secure your vehicle with competitive rates from Duuo, backed by The Co-operators' 80 years of insurance expertise.
+              Secure your vehicle with competitive rates from Duuo, backed by Co-operators' 80 years of insurance expertise.
             </p>
             <button className="cta-button" onClick={handleGetStarted}>
               Get Your Quote
@@ -49,7 +49,7 @@ const Welcome = () => {
                 <span className="icon">💰</span>
               </div>
               <h3 className="feature-title">Great Rates</h3>
-              <p className="feature-description">Competitive pricing backed by The Co-operators' trusted reputation.</p>
+              <p className="feature-description">Competitive pricing backed by Co-operators' trusted reputation.</p>
             </div>
             
             <div className="feature-card">

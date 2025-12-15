@@ -18,7 +18,7 @@ const Header = () => {
       <div className="header-container">
         <div className="branding">
           <div className="logo" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>DUUO</div>
-          <div className="tagline">by The Co-operators</div>
+          <div className="tagline">by Co-operators</div>
         </div>
         <nav className="main-nav">
           <a href="#" className="nav-link">Insurance</a>
