@@ -8,6 +8,7 @@
   top: 0;
   z-index: 1000;
   transition: all 0.3s ease;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
 }
 
 .header-container {
@@ -34,6 +35,10 @@
   position: relative;
   display: inline-block;
   cursor: pointer;
+  background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .logo:hover {

@@ -92,16 +92,16 @@ const DriverInfo = () => {
         city: 'Toronto',
         province: 'ON',
         postalCode: 'M5V 3A8',
-        hasPreviousClaims: 'no',
-        numberOfClaims: '',
-        claimDetails: '',
+        hasPreviousClaims: 'yes',
+        numberOfClaims: '1',
+        claimDetails: 'Rear-end collision in 2022 - $2,500 in damages',
         hasViolations: 'yes',
-        violationDetails: 'Speeding ticket in 2023',
-        demeritPoints: '4',
+        violationDetails: 'Speeding violation (15km/h over limit) - March 2023, Running red light - August 2023',
+        demeritPoints: '6',
         hasSuspensions: 'no',
         suspensionDetails: '',
         hasTickets: 'yes',
-        ticketDetails: 'Speeding violation - 2023, Parking ticket - 2024'
+        ticketDetails: 'Parking ticket - Downtown Toronto - January 2024, Expired registration - February 2024'
       };
       
       setScannedData(mockData);
@@ -346,39 +346,116 @@ const DriverInfo = () => {
             <div className="scan-section">
               <div className="scan-success">
                 <div className="success-icon">✅</div>
-                <h4>License Scanned Successfully!</h4>
+                <h3>License Scanned Successfully!</h3>
                 <p>Please review the information below and make any necessary corrections.</p>
+                
                 <div className="scanned-data-preview">
-                  <div className="data-row">
-                    <span className="label">Name:</span>
-                    <span className="value">{scannedData.firstName} {scannedData.lastName}</span>
+                  <div className="data-section">
+                    <h4>Personal Information</h4>
+                    <div className="data-row">
+                      <span className="label">Name:</span>
+                      <span className="value">{scannedData.firstName} {scannedData.lastName}</span>
+                    </div>
+                    <div className="data-row">
+                      <span className="label">Date of Birth:</span>
+                      <span className="value">{scannedData.dateOfBirth}</span>
+                    </div>
+                    <div className="data-row">
+                      <span className="label">Gender:</span>
+                      <span className="value">{scannedData.gender}</span>
+                    </div>
+                    <div className="data-row">
+                      <span className="label">Marital Status:</span>
+                      <span className="value">{scannedData.maritalStatus}</span>
+                    </div>
                   </div>
-                  <div className="data-row">
-                    <span className="label">Date of Birth:</span>
-                    <span className="value">{scannedData.dateOfBirth}</span>
+                  
+                  <div className="data-section">
+                    <h4>License Information</h4>
+                    <div className="data-row">
+                      <span className="label">License Number:</span>
+                      <span className="value">{scannedData.licenseNumber}</span>
+                    </div>
+                    <div className="data-row">
+                      <span className="label">Years Licensed:</span>
+                      <span className="value">{scannedData.yearsLicensed}</span>
+                    </div>
                   </div>
-                  <div className="data-row">
-                    <span className="label">Gender:</span>
-                    <span className="value">{scannedData.gender}</span>
+                  
+                  <div className="data-section">
+                    <h4>Address Information</h4>
+                    <div className="data-row">
+                      <span className="label">Street:</span>
+                      <span className="value">{scannedData.address}</span>
+                    </div>
+                    <div className="data-row">
+                      <span className="label">City:</span>
+                      <span className="value">{scannedData.city}</span>
+                    </div>
+                    <div className="data-row">
+                      <span className="label">Province:</span>
+                      <span className="value">{scannedData.province}</span>
+                    </div>
+                    <div className="data-row">
+                      <span className="label">Postal Code:</span>
+                      <span className="value">{scannedData.postalCode}</span>
+                    </div>
                   </div>
-                  <div className="data-row">
-                    <span className="label">Marital Status:</span>
-                    <span className="value">{scannedData.maritalStatus}</span>
-                  </div>
-                  <div className="data-row">
-                    <span className="label">License Number:</span>
-                    <span className="value">{scannedData.licenseNumber}</span>
-                  </div>
-                  <div className="data-row">
-                    <span className="label">Years Licensed:</span>
-                    <span className="value">{scannedData.yearsLicensed}</span>
-                  </div>
-                  <div className="data-row">
-                    <span className="label">Address:</span>
-                    <span className="value">{scannedData.address}, {scannedData.city}, {scannedData.province} {scannedData.postalCode}</span>
-                  </div>
+                  
+                  {scannedData.hasPreviousClaims === 'yes' && (
+                    <div className="data-section">
+                      <h4>Insurance Claims History</h4>
+                      <div className="data-row">
+                        <span className="label">Number of Claims:</span>
+                        <span className="value">{scannedData.numberOfClaims}</span>
+                      </div>
+                      <div className="data-row">
+                        <span className="label">Claim Details:</span>
+                        <span className="value long-text">{scannedData.claimDetails}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {scannedData.hasViolations === 'yes' && (
+                    <div className="data-section">
+                      <h4>Traffic Violations</h4>
+                      <div className="data-row">
+                        <span className="label">Demerit Points:</span>
+                        <span className="value">{scannedData.demeritPoints}</span>
+                      </div>
+                      <div className="data-row">
+                        <span className="label">Violation Details:</span>
+                        <span className="value long-text">{scannedData.violationDetails}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {scannedData.hasTickets === 'yes' && (
+                    <div className="data-section">
+                      <h4>Traffic Tickets</h4>
+                      <div className="data-row">
+                        <span className="label">Ticket Details:</span>
+                        <span className="value long-text">{scannedData.ticketDetails}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {scannedData.hasSuspensions === 'yes' && (
+                    <div className="data-section">
+                      <h4>License Suspensions</h4>
+                      <div className="data-row">
+                        <span className="label">Suspension Details:</span>
+                        <span className="value long-text">{scannedData.suspensionDetails}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <p className="review-note">All information will be securely stored and used only for your insurance quote.</p>
+                
+                <div className="review-note">
+                  All information will be securely stored and used only for your insurance quote.
+                  <br />
+                  <strong>Double-check the details above to ensure accuracy.</strong>
+                </div>
                 
                 <div className="confirmation-buttons">
                   <button 
@@ -388,13 +465,13 @@ const DriverInfo = () => {
                       setEntryMethod('');
                     }}
                   >
-                    Rescan License
+                    🔄 Rescan License
                   </button>
                   <button 
                     className="btn-primary" 
                     onClick={handleConfirmAndContinue}
                   >
-                    Confirm and Continue
+                    ✅ Confirm and Continue
                   </button>
                 </div>
               </div>
