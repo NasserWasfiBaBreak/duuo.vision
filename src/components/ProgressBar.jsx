@@ -5,12 +5,12 @@ const ProgressBar = () => {
   const { currentStep } = useFormContext();
   
   const steps = [
-    { id: 0, label: 'Welcome', description: 'Start your quote', time: '1 min' },
-    { id: 1, label: 'Driver Info', description: 'Personal & license details', time: '3 mins' },
-    { id: 2, label: 'Vehicle Info', description: 'Car details & VIN', time: '2 mins' },
-    { id: 3, label: 'Personal Details', description: 'Contact & preferences', time: '2 mins' },
-    { id: 4, label: 'Coverage', description: 'Select protections', time: '2 mins' },
-    { id: 5, label: 'Review', description: 'Check & confirm', time: '1 min' }
+    { id: 0, label: 'Welcome', description: 'Start your quote' },
+    { id: 1, label: 'Driver Info', description: 'Personal & license details' },
+    { id: 2, label: 'Vehicle Info', description: 'Car details & VIN' },
+    { id: 3, label: 'Personal Details', description: 'Contact & preferences' },
+    { id: 4, label: 'Coverage', description: 'Select protections' },
+    { id: 5, label: 'Review', description: 'Check & confirm' }
   ];
 
   return (
@@ -22,7 +22,7 @@ const ProgressBar = () => {
               <div className="step-number">{step.id + 1}</div>
               <div className="step-label">{step.label}</div>
               <div className="step-description">{step.description}</div>
-              <div className="step-time">{step.time}</div>
+              {/* Time display removed */}
             </div>
             {index < steps.length - 1 && (
               <div className={`progress-line ${currentStep > step.id ? 'active' : ''}`}></div>

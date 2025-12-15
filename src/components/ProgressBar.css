@@ -112,17 +112,6 @@
   z-index: 2;
 }
 
-.step-time {
-  font-size: 0.7rem;
-  color: #0066cc;
-  font-weight: 600;
-  background: rgba(0, 102, 204, 0.1);
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  position: relative;
-  z-index: 2;
-}
-
 .progress-line {
   flex: 1;
   height: 4px;
@@ -164,11 +153,6 @@
     max-width: 100px;
   }
   
-  .step-time {
-    font-size: 0.6rem;
-    padding: 0.2rem 0.4rem;
-  }
-  
   .step-number {
     width: 40px;
     height: 40px;
@@ -199,11 +183,6 @@
   
   .step-description {
     display: none;
-  }
-  
-  .step-time {
-    font-size: 0.55rem;
-    padding: 0.15rem 0.3rem;
   }
   
   .step-number {
