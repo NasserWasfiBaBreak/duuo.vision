@@ -1,0 +1,758 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useFormContext } from '../context/FormContext';
+import './FormPage.css';
+
+const DriverInfo = () => {
+  const { formData, updateMultipleFields } = useFormContext();
+  const [errors, setErrors] = useState({});
+  const [entryMethod, setEntryMethod] = useState(''); // 'scan' or 'manual'
+  const [scannedData, setScannedData] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const navigate = useNavigate();
+
+  // Automatically initiate scanning when scan option is selected
+  useEffect(() => {
+    if (entryMethod === 'scan' && !scannedData && !isScanning) {
+      simulateScan();
+    }
+  }, [entryMethod]);
+
+  const handleMethodChange = (method) => {
+    setEntryMethod(method);
+    setErrors({});
+    
+    // Clear form data when switching methods
+    if (method === 'manual') {
+      updateMultipleFields({
+        firstName: '',
+        lastName: '',
+        dateOfBirth: '',
+        gender: '',
+        maritalStatus: '',
+        licenseNumber: '',
+        yearsLicensed: '',
+        hasPreviousClaims: '',
+        numberOfClaims: '',
+        claimDetails: '',
+        hasViolations: '',
+        violationDetails: '',
+        demeritPoints: ''
+      });
+      setScannedData(null);
+      setShowConfirmation(false);
+    }
+  };
+
+  const simulateScan = () => {
+    setIsScanning(true);
+    
+    // Simulate scanning delay
+    setTimeout(() => {
+      const mockData = {
+        firstName: 'John',
+        lastName: 'Smith',
+        dateOfBirth: '1990-05-15',
+        gender: 'male',
+        maritalStatus: 'married',
+        licenseNumber: 'S12345678',
+        yearsLicensed: '10+',
+        hasPreviousClaims: 'no',
+        numberOfClaims: '',
+        claimDetails: '',
+        hasViolations: 'no',
+        violationDetails: '',
+        demeritPoints: '0'
+      };
+      
+      setScannedData(mockData);
+      updateMultipleFields(mockData);
+      setIsScanning(false);
+      setShowConfirmation(true);
+    }, 2000);
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const newValue = type === 'checkbox' ? checked : value;
+    updateMultipleFields({ [name]: newValue });
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    
+    // Handle conditional fields
+    if (name === 'hasPreviousClaims' && value === 'no') {
+      updateMultipleFields({ numberOfClaims: '', claimDetails: '' });
+    }
+    if (name === 'hasViolations' && value === 'no') {
+      updateMultipleFields({ violationDetails: '' });
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    
+    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
+    if (!formData.gender) newErrors.gender = 'Gender is required';
+    if (!formData.maritalStatus) newErrors.maritalStatus = 'Marital status is required';
+    if (!formData.licenseNumber.trim()) newErrors.licenseNumber = 'License number is required';
+    if (!formData.yearsLicensed) newErrors.yearsLicensed = 'Years licensed is required';
+    
+    // Validate claims section
+    if (formData.hasPreviousClaims === 'yes') {
+      if (!formData.numberOfClaims) newErrors.numberOfClaims = 'Number of claims is required';
+      if (!formData.claimDetails.trim()) newErrors.claimDetails = 'Claim details are required';
+    }
+    
+    // Validate violations section
+    if (formData.hasViolations === 'yes') {
+      if (!formData.violationDetails.trim()) newErrors.violationDetails = 'Violation details are required';
+    }
+    
+    // Validate demerit points
+    if (formData.demeritPoints && isNaN(formData.demeritPoints)) {
+      newErrors.demeritPoints = 'Demerit points must be a number';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validate()) {
+      navigate('/vehicle-info');
+    }
+  };
+
+  const handleConfirmAndContinue = () => {
+    if (validate()) {
+      navigate('/vehicle-info');
+    }
+  };
+
+  return (
+    <div className="form-page">
+      <div className="form-container">
+        <div className="form-header">
+          <h2>Driver Information</h2>
+          <p>Please provide details about the primary driver</p>
+        </div>
+        
+        {!entryMethod ? (
+          <div className="form-content">
+            <div className="method-selection">
+              <h3 className="section-title">How would you like to provide driver information?</h3>
+              <div className="method-options">
+                <div 
+                  className="method-option" 
+                  onClick={() => handleMethodChange('scan')}
+                >
+                  <div className="method-icon">📷</div>
+                  <h4>Scan Driver's License</h4>
+                  <p>Automatically fill information by scanning your driver's license</p>
+                </div>
+                
+                <div 
+                  className="method-option" 
+                  onClick={() => handleMethodChange('manual')}
+                >
+                  <div className="method-icon">✏️</div>
+                  <h4>Enter Manually</h4>
+                  <p>Fill in driver information manually</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="form-content">
+            {entryMethod === 'scan' && (
+              <div className="scan-section">
+                <h3 className="section-title">Scan Driver's License</h3>
+                {!scannedData ? (
+                  <div className="scan-prompt">
+                    <p>Scanning your driver's license...</p>
+                    <div className="spinner"></div>
+                    <p className="scanning-text">Please hold your license steady</p>
+                  </div>
+                ) : showConfirmation ? (
+                  <div className="scan-success">
+                    <div className="success-icon">✅</div>
+                    <h4>License Scanned Successfully!</h4>
+                    <p>Please review the information below and make any necessary corrections.</p>
+                    <div className="scanned-data-preview">
+                      <div className="data-row">
+                        <span className="label">Name:</span>
+                        <span className="value">{scannedData.firstName} {scannedData.lastName}</span>
+                      </div>
+                      <div className="data-row">
+                        <span className="label">Date of Birth:</span>
+                        <span className="value">{scannedData.dateOfBirth}</span>
+                      </div>
+                      <div className="data-row">
+                        <span className="label">License Number:</span>
+                        <span className="value">{scannedData.licenseNumber}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="confirmation-buttons">
+                      <button 
+                        type="button" 
+                        className="btn-secondary"
+                        onClick={() => setShowConfirmation(false)}
+                      >
+                        Edit Information
+                      </button>
+                      <button 
+                        type="button" 
+                        className="btn-primary"
+                        onClick={handleConfirmAndContinue}
+                      >
+                        Confirm and Continue
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="form-section">
+                    <h3 className="section-title">Review Scanned Information</h3>
+                    <p className="review-note">Please review and edit if necessary before continuing.</p>
+                    
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="firstName">First Name *</label>
+                        <input
+                          type="text"
+                          id="firstName"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          className={errors.firstName ? 'error' : ''}
+                        />
+                        {errors.firstName && <span className="error-message">{errors.firstName}</span>}
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="lastName">Last Name *</label>
+                        <input
+                          type="text"
+                          id="lastName"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleChange}
+                          className={errors.lastName ? 'error' : ''}
+                        />
+                        {errors.lastName && <span className="error-message">{errors.lastName}</span>}
+                      </div>
+                    </div>
+                    
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="dateOfBirth">Date of Birth *</label>
+                        <input
+                          type="date"
+                          id="dateOfBirth"
+                          name="dateOfBirth"
+                          value={formData.dateOfBirth}
+                          onChange={handleChange}
+                          className={errors.dateOfBirth ? 'error' : ''}
+                        />
+                        {errors.dateOfBirth && <span className="error-message">{errors.dateOfBirth}</span>}
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="gender">Gender *</label>
+                        <select
+                          id="gender"
+                          name="gender"
+                          value={formData.gender}
+                          onChange={handleChange}
+                          className={errors.gender ? 'error' : ''}
+                        >
+                          <option value="">Select Gender</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                          <option value="prefer-not-to-say">Prefer not to say</option>
+                        </select>
+                        {errors.gender && <span className="error-message">{errors.gender}</span>}
+                      </div>
+                    </div>
+                    
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="maritalStatus">Marital Status *</label>
+                        <select
+                          id="maritalStatus"
+                          name="maritalStatus"
+                          value={formData.maritalStatus}
+                          onChange={handleChange}
+                          className={errors.maritalStatus ? 'error' : ''}
+                        >
+                          <option value="">Select Status</option>
+                          <option value="single">Single</option>
+                          <option value="married">Married</option>
+                          <option value="common-law">Common Law</option>
+                          <option value="divorced">Divorced</option>
+                          <option value="separated">Separated</option>
+                          <option value="widowed">Widowed</option>
+                        </select>
+                        {errors.maritalStatus && <span className="error-message">{errors.maritalStatus}</span>}
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="licenseNumber">Driver's License Number *</label>
+                        <input
+                          type="text"
+                          id="licenseNumber"
+                          name="licenseNumber"
+                          value={formData.licenseNumber}
+                          onChange={handleChange}
+                          className={errors.licenseNumber ? 'error' : ''}
+                        />
+                        {errors.licenseNumber && <span className="error-message">{errors.licenseNumber}</span>}
+                      </div>
+                    </div>
+                    
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="yearsLicensed">Years Licensed *</label>
+                        <select
+                          id="yearsLicensed"
+                          name="yearsLicensed"
+                          value={formData.yearsLicensed}
+                          onChange={handleChange}
+                          className={errors.yearsLicensed ? 'error' : ''}
+                        >
+                          <option value="">Select Years</option>
+                          <option value="0-1">Less than 1 year</option>
+                          <option value="1-3">1-3 years</option>
+                          <option value="3-5">3-5 years</option>
+                          <option value="5-10">5-10 years</option>
+                          <option value="10+">More than 10 years</option>
+                        </select>
+                        {errors.yearsLicensed && <span className="error-message">{errors.yearsLicensed}</span>}
+                      </div>
+                    </div>
+                </div>
+                
+                {/* Driver History Section */}
+                <div className="form-section">
+                  <h3 className="section-title">Driver History</h3>
+                  
+                  <div className="form-group">
+                    <label>Have you had any insurance claims in the past 3 years? *</label>
+                    <div className="radio-group">
+                      <label className="radio-label">
+                        <input
+                          type="radio"
+                          name="hasPreviousClaims"
+                          value="yes"
+                          checked={formData.hasPreviousClaims === 'yes'}
+                          onChange={handleChange}
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label className="radio-label">
+                        <input
+                          type="radio"
+                          name="hasPreviousClaims"
+                          value="no"
+                          checked={formData.hasPreviousClaims === 'no'}
+                          onChange={handleChange}
+                        />
+                        <span>No</span>
+                      </label>
+                    </div>
+                    {errors.hasPreviousClaims && <span className="error-message">{errors.hasPreviousClaims}</span>}
+                  </div>
+                  
+                  {formData.hasPreviousClaims === 'yes' && (
+                    <>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label htmlFor="numberOfClaims">Number of Claims *</label>
+                          <select
+                            id="numberOfClaims"
+                            name="numberOfClaims"
+                            value={formData.numberOfClaims}
+                            onChange={handleChange}
+                            className={errors.numberOfClaims ? 'error' : ''}
+                          >
+                            <option value="">Select Number</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5+">5 or more</option>
+                          </select>
+                          {errors.numberOfClaims && <span className="error-message">{errors.numberOfClaims}</span>}
+                        </div>
+                        
+                        <div className="form-group">
+                          <label htmlFor="claimDetails">Brief Description of Claims *</label>
+                          <textarea
+                            id="claimDetails"
+                            name="claimDetails"
+                            value={formData.claimDetails}
+                            onChange={handleChange}
+                            placeholder="Please describe the nature of the claims (e.g., fender bender, theft, weather damage)"
+                            className={errors.claimDetails ? 'error' : ''}
+                          ></textarea>
+                          {errors.claimDetails && <span className="error-message">{errors.claimDetails}</span>}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  
+                  <div className="form-group">
+                    <label>Have you had any traffic violations in the past 3 years? *</label>
+                    <div className="radio-group">
+                      <label className="radio-label">
+                        <input
+                          type="radio"
+                          name="hasViolations"
+                          value="yes"
+                          checked={formData.hasViolations === 'yes'}
+                          onChange={handleChange}
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label className="radio-label">
+                        <input
+                          type="radio"
+                          name="hasViolations"
+                          value="no"
+                          checked={formData.hasViolations === 'no'}
+                          onChange={handleChange}
+                        />
+                        <span>No</span>
+                      </label>
+                    </div>
+                    {errors.hasViolations && <span className="error-message">{errors.hasViolations}</span>}
+                  </div>
+                  
+                  {formData.hasViolations === 'yes' && (
+                    <div className="form-group">
+                      <label htmlFor="violationDetails">Brief Description of Violations *</label>
+                      <textarea
+                        id="violationDetails"
+                        name="violationDetails"
+                        value={formData.violationDetails}
+                        onChange={handleChange}
+                        placeholder="Please describe the violations (e.g., speeding, running red light, careless driving)"
+                        className={errors.violationDetails ? 'error' : ''}
+                      ></textarea>
+                      {errors.violationDetails && <span className="error-message">{errors.violationDetails}</span>}
+                    </div>
+                  )}
+                  
+                  <div className="form-group">
+                    <label htmlFor="demeritPoints">Current Demerit Points</label>
+                    <input
+                      type="number"
+                      id="demeritPoints"
+                      name="demeritPoints"
+                      value={formData.demeritPoints}
+                      onChange={handleChange}
+                      placeholder="Enter number of demerit points"
+                      className={errors.demeritPoints ? 'error' : ''}
+                    />
+                    {errors.demeritPoints && <span className="error-message">{errors.demeritPoints}</span>}
+                  </div>
+                </div>
+                
+                <div className="form-navigation">
+                  <button 
+                    type="button" 
+                    className="btn-secondary" 
+                    onClick={() => setEntryMethod('')}
+                  >
+                    Back
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn-primary"
+                    onClick={handleConfirmAndContinue}
+                  >
+                    Continue
+                  </button>
+                </div>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {entryMethod === 'manual' && (
+              <div className="form-section">
+                <h3 className="section-title">Driver Information</h3>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="firstName">First Name *</label>
+                    <input
+                      type="text"
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className={errors.firstName ? 'error' : ''}
+                    />
+                    {errors.firstName && <span className="error-message">{errors.firstName}</span>}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="lastName">Last Name *</label>
+                    <input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      className={errors.lastName ? 'error' : ''}
+                    />
+                    {errors.lastName && <span className="error-message">{errors.lastName}</span>}
+                  </div>
+                </div>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="dateOfBirth">Date of Birth *</label>
+                    <input
+                      type="date"
+                      id="dateOfBirth"
+                      name="dateOfBirth"
+                      value={formData.dateOfBirth}
+                      onChange={handleChange}
+                      className={errors.dateOfBirth ? 'error' : ''}
+                    />
+                    {errors.dateOfBirth && <span className="error-message">{errors.dateOfBirth}</span>}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="gender">Gender *</label>
+                    <select
+                      id="gender"
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      className={errors.gender ? 'error' : ''}
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                      <option value="prefer-not-to-say">Prefer not to say</option>
+                    </select>
+                    {errors.gender && <span className="error-message">{errors.gender}</span>}
+                  </div>
+                </div>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="maritalStatus">Marital Status *</label>
+                    <select
+                      id="maritalStatus"
+                      name="maritalStatus"
+                      value={formData.maritalStatus}
+                      onChange={handleChange}
+                      className={errors.maritalStatus ? 'error' : ''}
+                    >
+                      <option value="">Select Status</option>
+                      <option value="single">Single</option>
+                      <option value="married">Married</option>
+                      <option value="common-law">Common Law</option>
+                      <option value="divorced">Divorced</option>
+                      <option value="separated">Separated</option>
+                      <option value="widowed">Widowed</option>
+                    </select>
+                    {errors.maritalStatus && <span className="error-message">{errors.maritalStatus}</span>}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="licenseNumber">Driver's License Number *</label>
+                    <input
+                      type="text"
+                      id="licenseNumber"
+                      name="licenseNumber"
+                      value={formData.licenseNumber}
+                      onChange={handleChange}
+                      className={errors.licenseNumber ? 'error' : ''}
+                    />
+                    {errors.licenseNumber && <span className="error-message">{errors.licenseNumber}</span>}
+                  </div>
+                </div>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="yearsLicensed">Years Licensed *</label>
+                    <select
+                      id="yearsLicensed"
+                      name="yearsLicensed"
+                      value={formData.yearsLicensed}
+                      onChange={handleChange}
+                      className={errors.yearsLicensed ? 'error' : ''}
+                    >
+                      <option value="">Select Years</option>
+                      <option value="0-1">Less than 1 year</option>
+                      <option value="1-3">1-3 years</option>
+                      <option value="3-5">3-5 years</option>
+                      <option value="5-10">5-10 years</option>
+                      <option value="10+">More than 10 years</option>
+                    </select>
+                    {errors.yearsLicensed && <span className="error-message">{errors.yearsLicensed}</span>}
+                  </div>
+                </div>
+                
+                {/* Driver History Section */}
+                <div className="form-section">
+                  <h3 className="section-title">Driver History</h3>
+                  
+                  <div className="form-group">
+                    <label>Have you had any insurance claims in the past 3 years? *</label>
+                    <div className="radio-group">
+                      <label className="radio-label">
+                        <input
+                          type="radio"
+                          name="hasPreviousClaims"
+                          value="yes"
+                          checked={formData.hasPreviousClaims === 'yes'}
+                          onChange={handleChange}
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label className="radio-label">
+                        <input
+                          type="radio"
+                          name="hasPreviousClaims"
+                          value="no"
+                          checked={formData.hasPreviousClaims === 'no'}
+                          onChange={handleChange}
+                        />
+                        <span>No</span>
+                      </label>
+                    </div>
+                    {errors.hasPreviousClaims && <span className="error-message">{errors.hasPreviousClaims}</span>}
+                  </div>
+                  
+                  {formData.hasPreviousClaims === 'yes' && (
+                    <>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label htmlFor="numberOfClaims">Number of Claims *</label>
+                          <select
+                            id="numberOfClaims"
+                            name="numberOfClaims"
+                            value={formData.numberOfClaims}
+                            onChange={handleChange}
+                            className={errors.numberOfClaims ? 'error' : ''}
+                          >
+                            <option value="">Select Number</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5+">5 or more</option>
+                          </select>
+                          {errors.numberOfClaims && <span className="error-message">{errors.numberOfClaims}</span>}
+                        </div>
+                        
+                        <div className="form-group">
+                          <label htmlFor="claimDetails">Brief Description of Claims *</label>
+                          <textarea
+                            id="claimDetails"
+                            name="claimDetails"
+                            value={formData.claimDetails}
+                            onChange={handleChange}
+                            placeholder="Please describe the nature of the claims (e.g., fender bender, theft, weather damage)"
+                            className={errors.claimDetails ? 'error' : ''}
+                          ></textarea>
+                          {errors.claimDetails && <span className="error-message">{errors.claimDetails}</span>}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  
+                  <div className="form-group">
+                    <label>Have you had any traffic violations in the past 3 years? *</label>
+                    <div className="radio-group">
+                      <label className="radio-label">
+                        <input
+                          type="radio"
+                          name="hasViolations"
+                          value="yes"
+                          checked={formData.hasViolations === 'yes'}
+                          onChange={handleChange}
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label className="radio-label">
+                        <input
+                          type="radio"
+                          name="hasViolations"
+                          value="no"
+                          checked={formData.hasViolations === 'no'}
+                          onChange={handleChange}
+                        />
+                        <span>No</span>
+                      </label>
+                    </div>
+                    {errors.hasViolations && <span className="error-message">{errors.hasViolations}</span>}
+                  </div>
+                  
+                  {formData.hasViolations === 'yes' && (
+                    <div className="form-group">
+                      <label htmlFor="violationDetails">Brief Description of Violations *</label>
+                      <textarea
+                        id="violationDetails"
+                        name="violationDetails"
+                        value={formData.violationDetails}
+                        onChange={handleChange}
+                        placeholder="Please describe the violations (e.g., speeding, running red light, careless driving)"
+                        className={errors.violationDetails ? 'error' : ''}
+                      ></textarea>
+                      {errors.violationDetails && <span className="error-message">{errors.violationDetails}</span>}
+                    </div>
+                  )}
+                  
+                  <div className="form-group">
+                    <label htmlFor="demeritPoints">Current Demerit Points</label>
+                    <input
+                      type="number"
+                      id="demeritPoints"
+                      name="demeritPoints"
+                      value={formData.demeritPoints}
+                      onChange={handleChange}
+                      placeholder="Enter number of demerit points"
+                      className={errors.demeritPoints ? 'error' : ''}
+                    />
+                    {errors.demeritPoints && <span className="error-message">{errors.demeritPoints}</span>}
+                  </div>
+                </div>
+                
+                <div className="form-navigation">
+                  <button 
+                    type="button" 
+                    className="btn-secondary" 
+                    onClick={() => setEntryMethod('')}
+                  >
+                    Back
+                  </button>
+                  <button type="submit" className="btn-primary">
+                    Continue
+                  </button>
+                </div>
+              </div>
+            )}
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default DriverInfo;
