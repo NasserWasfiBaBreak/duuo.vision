@@ -65,10 +65,16 @@ const VehicleInfo = () => {
     e.preventDefault();
     const vin = formData.vin;
     
-    if (!vin || vin.length !== 17) {
+    // Clean the VIN value for validation
+    const cleanVin = vin.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    
+    if (!cleanVin || cleanVin.length !== 17) {
       setErrors({ vin: 'Please enter a valid 17-character VIN' });
       return;
     }
+    
+    // Update the form data with the cleaned VIN
+    updateMultipleFields({ vin: cleanVin });
     
     setErrors({});
     simulateVinLookup();
@@ -79,7 +85,9 @@ const VehicleInfo = () => {
     switch (name) {
       case 'vin':
         if (!value.trim()) return 'VIN is required';
-        if (value.trim().length !== 17) return 'VIN must be exactly 17 characters';
+        // Clean the value for validation
+        const cleanValue = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        if (cleanValue.length !== 17) return 'VIN must be exactly 17 alphanumeric characters';
         return '';
       case 'year':
         if (!value) return 'Vehicle year is required';
@@ -105,7 +113,21 @@ const VehicleInfo = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    updateMultipleFields({ [name]: value });
+    
+    // Special handling for VIN field to limit to 17 characters
+    if (name === 'vin') {
+      // Remove any non-alphanumeric characters and convert to uppercase
+      let formattedValue = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      
+      // Limit to 17 characters
+      if (formattedValue.length > 17) {
+        formattedValue = formattedValue.substring(0, 17);
+      }
+      
+      updateMultipleFields({ [name]: formattedValue });
+    } else {
+      updateMultipleFields({ [name]: value });
+    }
     
     // Mark field as touched
     setTouched(prev => ({ ...prev, [name]: true }));
@@ -223,6 +245,7 @@ const VehicleInfo = () => {
                       maxLength="17"
                       className={errors.vin ? 'error' : ''}
                     />
+                    <div className="help-text">Enter exactly 17 alphanumeric characters</div>
                     {errors.vin && <span className="error-message">{errors.vin}</span>}
                   </div>
                 </div>
@@ -447,6 +470,7 @@ const VehicleInfo = () => {
                       maxLength="17"
                       className={errors.vin ? 'error' : ''}
                     />
+                    <div className="help-text">Enter exactly 17 alphanumeric characters</div>
                     {errors.vin && <span className="error-message">{errors.vin}</span>}
                   </div>
                 </div>
