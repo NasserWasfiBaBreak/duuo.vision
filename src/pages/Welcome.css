@@ -437,6 +437,9 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .benefit-item:last-child {
@@ -455,6 +458,7 @@
   justify-content: center;
   background: rgba(0, 102, 204, 0.1);
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 /* Responsive Design */
@@ -530,6 +534,7 @@
   .benefit-item {
     font-size: 1rem;
     padding: 0.8rem 0;
+    font-weight: 500;
   }
 }
 
@@ -613,6 +618,7 @@
     font-size: 0.95rem;
     padding: 0.75rem 0;
     gap: 0.75rem;
+    font-weight: 500;
   }
 }
 
@@ -640,6 +646,7 @@
   .benefit-item {
     font-size: 0.9rem;
     padding: 0.6rem 0;
+    font-weight: 500;
   }
   
   .placeholder-image {

@@ -69,10 +69,10 @@ const Welcome = () => {
           <div className="benefits-content">
             <h2 className="section-title">Our Promise To You</h2>
             <ul className="benefits-list">
-              <li className="benefit-item">✔ Accident forgiveness guarantee</li>
-              <li className="benefit-item">✔ 24/7 claims support</li>
-              <li className="benefit-item">✔ Flexible payment options</li>
-              <li className="benefit-item">✔ No hidden fees</li>
+              <li className="benefit-item">Accident forgiveness guarantee</li>
+              <li className="benefit-item">24/7 claims support</li>
+              <li className="benefit-item">Flexible payment options</li>
+              <li className="benefit-item">No hidden fees</li>
             </ul>
           </div>
         </div>
