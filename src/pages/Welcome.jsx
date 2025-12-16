@@ -77,6 +77,36 @@ const Welcome = () => {
           </div>
         </div>
       </section>
+      
+      {/* Footer */}
+      <footer className="welcome-footer">
+        <div className="footer-content">
+          <div className="footer-section">
+            <h3>Duuo Insurance</h3>
+            <p>Providing reliable auto insurance solutions backed by Co-operators' 80+ years of experience.</p>
+          </div>
+          
+          <div className="footer-section">
+            <h4>Contact Us</h4>
+            <p>📞 1-800-123-4567</p>
+            <p>📧 support@duuo.ca</p>
+            <p>🌐 www.duuo.ca</p>
+          </div>
+          
+          <div className="footer-section">
+            <h4>Quick Links</h4>
+            <ul className="footer-links">
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">FAQ</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div className="footer-bottom">
+          <p>&copy; {new Date().getFullYear()} Duuo Insurance. All rights reserved. by cooperators</p>
+        </div>
+      </footer>
     </div>
   );
 };
