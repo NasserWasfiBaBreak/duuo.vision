@@ -12,6 +12,8 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 24px;
+  margin: 2rem;
 }
 
 .hero-section::before {
@@ -28,7 +30,7 @@
 .hero-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 2rem 1rem;
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -136,6 +138,7 @@
   align-items: center;
   gap: 0.5rem;
   animation: fadeIn 0.8s ease-out 0.4s both;
+  transform: translateY(0);
 }
 
 .cta-button:hover {
@@ -189,7 +192,7 @@
   max-width: 400px;
   height: 300px;
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
+  border-radius: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -463,9 +466,15 @@
 
 /* Responsive Design */
 @media (max-width: 992px) {
+  .hero-section {
+    margin: 1rem;
+    border-radius: 20px;
+  }
+  
   .hero-container {
     flex-direction: column;
     text-align: center;
+    padding: 1.5rem 1rem;
   }
   
   .hero-content {
@@ -491,6 +500,12 @@
     width: 100%;
     max-width: 300px;
     justify-content: center;
+  }
+  
+  .placeholder-image {
+    border-radius: 20px;
+    height: 250px;
+    max-width: 300px;
   }
   
   .features-section {
@@ -541,10 +556,12 @@
 @media (max-width: 768px) {
   .hero-section {
     padding: 2rem 0;
+    margin: 0.75rem;
+    border-radius: 16px;
   }
   
   .hero-container {
-    padding: 0 1rem;
+    padding: 1rem;
     gap: 2rem;
   }
   
@@ -569,6 +586,7 @@
   .placeholder-image {
     height: 250px;
     max-width: 300px;
+    border-radius: 16px;
   }
   
   .features-section {
@@ -623,6 +641,11 @@
 }
 
 @media (max-width: 576px) {
+  .hero-section {
+    margin: 0.5rem;
+    border-radius: 12px;
+  }
+  
   .hero-title {
     font-size: 1.6rem;
   }
@@ -651,5 +674,11 @@
   
   .placeholder-image {
     height: 200px;
+    border-radius: 12px;
+  }
+  
+  .cta-button {
+    padding: 0.8rem 1.25rem;
+    font-size: 0.95rem;
   }
 }

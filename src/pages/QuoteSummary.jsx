@@ -201,7 +201,7 @@ const QuoteSummary = () => {
         </div>
         
         <div className="form-navigation">
-          <button type="button" className="btn-secondary" onClick={() => navigate('/personal-details')}>
+          <button type="button" className="btn-secondary" onClick={() => navigate('/coverage')}>
             Back
           </button>
         </div>

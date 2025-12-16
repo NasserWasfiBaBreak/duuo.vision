@@ -18,10 +18,11 @@ const PersonalDetails = () => {
     if (formData.phone && !touched.phone) {
       setTouched(prev => ({ ...prev, phone: true }));
     }
-  }, []);
+  }, [formData, touched]);
 
   // Real-time validation
   const validateField = (name, value) => {
+    console.log(`Validating field ${name} with value:`, value);
     switch (name) {
       case 'email':
         if (!value) return 'Email is required';
@@ -68,19 +69,56 @@ const PersonalDetails = () => {
     
     // Validate all fields
     const fieldsToValidate = ['email', 'phone', 'preferredContact'];
+    console.log('=== Starting Validation ===');
+    console.log('Fields to validate:', fieldsToValidate);
+    console.log('Current form data:', formData);
+    
     fieldsToValidate.forEach(field => {
-      const error = validateField(field, formData[field]);
-      if (error) newErrors[field] = error;
+      const fieldValue = formData[field];
+      console.log(`Checking field: ${field}`);
+      console.log(`Field value:`, fieldValue);
+      console.log(`Field type:`, typeof fieldValue);
+      
+      const error = validateField(field, fieldValue);
+      console.log(`Validation result for ${field}:`, error);
+      
+      if (error) {
+        newErrors[field] = error;
+        console.log(`Adding error for ${field}:`, error);
+      }
     });
     
+    console.log('Final validation errors:', newErrors);
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const isValid = Object.keys(newErrors).length === 0;
+    console.log('Is form valid:', isValid);
+    return isValid;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validate()) {
+    console.log('=== Personal Details Form Submission ===');
+    console.log('Form data:', formData);
+    console.log('Validating fields:', ['email', 'phone', 'preferredContact']);
+    console.log('Email value:', formData.email);
+    console.log('Phone value:', formData.phone);
+    console.log('Preferred contact value:', formData.preferredContact);
+    
+    const isValid = validate();
+    console.log('Validation result:', isValid);
+    console.log('Validation errors:', errors);
+    
+    if (isValid) {
+      console.log('Validation passed, navigating to /coverage');
       navigate('/coverage');
+    } else {
+      console.log('Validation failed, errors:', errors);
+      // Scroll to first error
+      const firstErrorElement = document.querySelector('.error, .error-message');
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorElement.focus();
+      }
     }
   };
 

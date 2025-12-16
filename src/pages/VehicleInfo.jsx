@@ -14,13 +14,16 @@ const VehicleInfo = () => {
 
   // Set smart defaults based on existing data
   useEffect(() => {
-    // If we have some vehicle data already, set the entry method to manual
-    if (formData.year || formData.make || formData.model || formData.vin) {
+    console.log('VehicleInfo useEffect triggered, formData:', formData, 'entryMethod:', entryMethod);
+    // If we have some vehicle data already, but no entry method is set, set the entry method to manual
+    if ((formData.year || formData.make || formData.model || formData.vin) && !entryMethod) {
+      console.log('Setting entryMethod to manual because we have existing vehicle data');
       setEntryMethod('manual');
     }
-  }, []);
+  }, [formData, entryMethod]);
 
   const handleMethodChange = (method) => {
+    console.log('Setting entry method to:', method);
     setEntryMethod(method);
     setErrors({});
     
@@ -175,8 +178,12 @@ const VehicleInfo = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log('Vehicle form data:', formData);
     if (validate()) {
+      console.log('Vehicle validation passed, navigating to /personal-details');
       navigate('/personal-details');
+    } else {
+      console.log('Vehicle validation failed, errors:', errors);
     }
   };
 
@@ -276,7 +283,7 @@ const VehicleInfo = () => {
                 <div className="scan-prompt">
                   <p>Looking up vehicle information...</p>
                   <div className="spinner"></div>
-                  <p className="scanning-text">Please wait while we retrieve your vehicle details</p>
+                  <p className="scanning-text">Retrieving vehicle details</p>
                 </div>
                 
                 {/* Back button during lookup */}

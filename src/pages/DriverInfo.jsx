@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../context/FormContext';
 import { generateFieldSuggestions, predictFormValues } from '../utils/formSuggestions';
 import Tooltip from '../components/Tooltip';
+import ScanGuidance from '../components/ScanGuidance';
 import './FormPage.css';
 
 const DriverInfo = () => {
@@ -19,11 +20,13 @@ const DriverInfo = () => {
 
   // Set smart defaults based on existing data
   useEffect(() => {
-    // If we have some data already, set the entry method to manual
-    if (formData.firstName || formData.lastName || formData.licenseNumber) {
+    console.log('DriverInfo useEffect triggered, formData:', formData, 'entryMethod:', entryMethod);
+    // If we have some data already, but no entry method is set, set the entry method to manual
+    if ((formData.firstName || formData.lastName || formData.licenseNumber) && !entryMethod) {
+      console.log('Setting entryMethod to manual because we have existing data');
       setEntryMethod('manual');
     }
-  }, []);
+  }, [formData, entryMethod]);
 
   // Generate AI predictions when form data changes
   useEffect(() => {
@@ -39,6 +42,7 @@ const DriverInfo = () => {
   }, [entryMethod]);
 
   const handleMethodChange = (method) => {
+    console.log('Setting entry method to:', method);
     setEntryMethod(method);
     setErrors({});
     
@@ -74,10 +78,7 @@ const DriverInfo = () => {
 
   const simulateScan = () => {
     setIsScanning(true);
-    
-    // Show scanning guidance
-    alert("Please position your driver's license in the camera frame. Ensure the license is well-lit and fully visible.");
-    
+    // Scanning guidance is now shown via the ScanGuidance component
     // Simulate scanning delay
     setTimeout(() => {
       const mockData = {
@@ -318,29 +319,22 @@ const DriverInfo = () => {
             </div>
           </div>
         ) : entryMethod === 'scan' && isScanning ? (
-          <div className="form-content">
-            <div className="scan-section">
-              <h3 className="section-title">Scan Driver's License</h3>
-              <div className="scan-prompt">
-                <p>Scanning your driver's license...</p>
-                <div className="spinner"></div>
-                <p className="scanning-text">Please hold your license steady</p>
-              </div>
-              
-              <div className="form-navigation">
-                <button 
-                  type="button" 
-                  className="btn-secondary" 
-                  onClick={() => {
-                    setIsScanning(false);
-                    setEntryMethod('');
-                  }}
-                >
-                  Cancel Scan
-                </button>
+          <>
+            <ScanGuidance onCancel={() => {
+              setIsScanning(false);
+              setEntryMethod('');
+            }} />
+            <div className="form-content">
+              <div className="scan-section">
+                <h3 className="section-title">Scanning Driver's License</h3>
+                <div className="scan-prompt">
+                  <p>Scanning your driver's license...</p>
+                  <div className="spinner"></div>
+                  <p className="scanning-text">Processing license data</p>
+                </div>
               </div>
             </div>
-          </div>
+          </>
         ) : entryMethod === 'scan' && showConfirmation && scannedData ? (
           <div className="form-content">
             <div className="scan-section">

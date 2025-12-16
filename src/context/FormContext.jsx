@@ -146,7 +146,8 @@ export const FormProvider = ({ children }) => {
       '/vehicle-info': 2,
       '/personal-details': 3,
       '/coverage': 4,
-      '/quote-summary': 5
+      '/quote-summary': 5,
+      '/payment': 6
     };
     
     const step = routeMap[location.pathname] || 0;
