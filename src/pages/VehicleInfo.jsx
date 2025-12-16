@@ -44,9 +44,6 @@ const VehicleInfo = () => {
   const simulateVinLookup = () => {
     setIsLookingUp(true);
     
-    // Show VIN lookup guidance
-    alert("Please ensure you've entered a valid 17-character VIN. You can typically find this on your dashboard near the windshield or on your vehicle registration.");
-    
     // Simulate VIN lookup delay
     setTimeout(() => {
       const mockData = {
@@ -61,7 +58,7 @@ const VehicleInfo = () => {
       setVinData(mockData);
       updateMultipleFields(mockData);
       setIsLookingUp(false);
-    }, 2000);
+    }, 3000);
   };
 
   const handleVinSubmit = (e) => {
@@ -277,27 +274,21 @@ const VehicleInfo = () => {
               </div>
             )}
             
-            {entryMethod === 'vin' && isLookingUp && (
-              <div className="scan-section">
-                <h3 className="section-title">VIN Lookup</h3>
-                <div className="scan-prompt">
-                  <p>Looking up vehicle information...</p>
-                  <div className="spinner"></div>
-                  <p className="scanning-text">Retrieving vehicle details</p>
-                </div>
-                
-                {/* Back button during lookup */}
-                <div className="form-navigation">
-                  <button 
-                    type="button" 
-                    className="btn-secondary" 
-                    onClick={() => {
-                      setIsLookingUp(false);
-                      setEntryMethod('');
-                    }}
-                  >
-                    Cancel and Back
-                  </button>
+            {isLookingUp && (
+              <div className="floating-overlay">
+                <div className="floating-modal">
+                  <div className="car-search-animation">
+                    <div className="car-icon">🚗</div>
+                    <div className="search-lines">
+                      <div className="search-line"></div>
+                      <div className="search-line"></div>
+                      <div className="search-line"></div>
+                    </div>
+                    <div className="radar-circle"></div>
+                    <div className="radar-circle delayed"></div>
+                  </div>
+                  <p className="scanning-text">Searching for vehicle details...</p>
+                  <p className="hint-text">Please wait while we retrieve your vehicle information</p>
                 </div>
               </div>
             )}
