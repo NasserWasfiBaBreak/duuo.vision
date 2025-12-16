@@ -142,12 +142,12 @@ export const FormProvider = ({ children }) => {
   useEffect(() => {
     const routeMap = {
       '/': 0,
-      '/driver-info': 1,
-      '/vehicle-info': 2,
-      '/personal-details': 3,
-      '/coverage': 4,
-      '/quote-summary': 5,
-      '/payment': 6
+      '/driver-info': 0,
+      '/vehicle-info': 1,
+      '/personal-details': 2,
+      '/coverage': 3,
+      '/quote-summary': 4,
+      '/payment': 5
     };
     
     const step = routeMap[location.pathname] || 0;

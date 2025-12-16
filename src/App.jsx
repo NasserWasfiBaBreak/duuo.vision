@@ -2,7 +2,7 @@ import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-d
 import { FormProvider } from './context/FormContext';
 import { useEffect } from 'react';
 import Header from './components/Header';
-import ProgressBar from './components/ProgressBar';
+import ConditionalProgressBar from './components/ConditionalProgressBar';
 import AIAssistant from './components/AIAssistant';
 import Welcome from './pages/Welcome';
 import DriverInfo from './pages/DriverInfo';
@@ -32,7 +32,7 @@ function App() {
           <ScrollToTop />
           <a href="#main-content" className="skip-link">Skip to main content</a>
           <Header />
-          <ProgressBar />
+          <ConditionalProgressBar />
           <main id="main-content">
             <Routes>
               <Route path="/" element={<Welcome />} />

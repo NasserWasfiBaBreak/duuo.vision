@@ -6,13 +6,12 @@ const ProgressBar = () => {
   const { currentStep } = useFormContext();
   
   const steps = [
-    { id: 0, label: 'Welcome' },
-    { id: 1, label: 'Driver Info' },
-    { id: 2, label: 'Vehicle Info' },
-    { id: 3, label: 'Personal Details' },
-    { id: 4, label: 'Coverage' },
-    { id: 5, label: 'Review' },
-    { id: 6, label: 'Payment' }
+    { id: 0, label: 'Driver Info' },
+    { id: 1, label: 'Vehicle Info' },
+    { id: 2, label: 'Personal Details' },
+    { id: 3, label: 'Coverage' },
+    { id: 4, label: 'Review' },
+    { id: 5, label: 'Payment' }
   ];
   
   return (
