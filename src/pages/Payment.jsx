@@ -7,6 +7,7 @@ const Payment = () => {
   const { formData } = useFormContext();
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [billingCycle, setBillingCycle] = useState('yearly'); // 'yearly' or 'monthly'
   const [cardData, setCardData] = useState({
     cardNumber: '',
     expiryDate: '',
@@ -42,6 +43,12 @@ const Payment = () => {
   };
 
   const estimatedPremium = calculatePremium();
+  
+  // Calculate billing amounts based on cycle
+  const yearlyAmount = estimatedPremium;
+  const monthlyAmount = Math.round(yearlyAmount / 12 * 1.1); // 10% more for monthly payments
+  
+  const currentAmount = billingCycle === 'yearly' ? yearlyAmount : monthlyAmount;
 
   const handleCardInputChange = (e) => {
     const { name, value } = e.target;
@@ -135,10 +142,43 @@ const Payment = () => {
               <span className="value">{formData.year} {formData.make} {formData.model}</span>
             </div>
             <div className="summary-divider"></div>
-            <div className="summary-item total">
-              <span className="label">Total:</span>
-              <span className="value">${estimatedPremium.toLocaleString()}</span>
+            <div className="summary-item">
+              <span className="label">Billing Cycle:</span>
+              <div className="billing-cycle-selector">
+                <button 
+                  className={`cycle-option ${billingCycle === 'yearly' ? 'selected' : ''}`}
+                  onClick={() => setBillingCycle('yearly')}
+                >
+                  Yearly
+                </button>
+                <button 
+                  className={`cycle-option ${billingCycle === 'monthly' ? 'selected' : ''}`}
+                  onClick={() => setBillingCycle('monthly')}
+                >
+                  Monthly
+                </button>
+              </div>
             </div>
+            
+            {billingCycle === 'yearly' && (
+              <div className="summary-item discount-note">
+                <span className="label">Save 10% with yearly billing!</span>
+              </div>
+            )}
+            
+            <div className="summary-divider"></div>
+            
+            <div className="summary-item total">
+              <span className="label">Total ({billingCycle}):</span>
+              <span className="value">${currentAmount.toLocaleString()}</span>
+            </div>
+            
+            {billingCycle === 'monthly' && (
+              <div className="summary-item equivalent">
+                <span className="label">Equivalent yearly:</span>
+                <span className="value">${yearlyAmount.toLocaleString()}</span>
+              </div>
+            )}
           </div>
           
           <div className="payment-methods">

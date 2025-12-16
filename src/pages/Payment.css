@@ -81,6 +81,25 @@
   margin-top: 0.5rem;
 }
 
+.summary-item.discount-note {
+  background-color: #e8f5e9;
+  padding: 0.5rem;
+  border-radius: 4px;
+  text-align: center;
+  margin: 0.5rem 0;
+}
+
+.summary-item.discount-note .label {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.summary-item.equivalent {
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+}
+
 .summary-divider {
   border-top: 1px solid #ddd;
   margin: 0.5rem 0;
@@ -182,6 +201,35 @@
 .payment-option span {
   font-size: 0.9rem;
   color: #333;
+}
+
+.billing-cycle-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.cycle-option {
+  flex: 1;
+  padding: 0.5rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  color: #333;
+}
+
+.cycle-option:hover {
+  border-color: #0066cc;
+  background: #f0f8ff;
+}
+
+.cycle-option.selected {
+  border-color: #0066cc;
+  background: #0066cc;
+  color: white;
 }
 
 .card-form {
